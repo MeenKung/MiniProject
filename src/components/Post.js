@@ -7,26 +7,25 @@ export default (props) => {
 
     const plusCount = () => {
         if(count<stock){
-            let newCount = count+1
-            firestore.collection("posts").doc(id+'').set({id,title,image,stock,count:newCount})
+            firestore.collection("posts").doc(id+'').set({id,title,image,stock,count:count+1})
         }
         
     }
     const minusCount = () => {
         if(count>0){
-            let newCount = count-1
-            firestore.collection("posts").doc(id+'').set({id,title,image,stock,count:newCount})
+            firestore.collection("posts").doc(id+'').set({id,title,image,stock,count:count-1})
         }
     }
     return(
-    <li><div>{id}</div>
+    <li>
+        <div>{id}</div>
         <div >{title}</div>
-        <img src={image} height="100"/>
+        <img src={image} height="100" alt=''/>
         <div className="container">
         <button onClick={minusCount}>-</button>
         {count}
         <button onClick={plusCount}>+</button>
-        {stock}
+        Stock:{stock}
         </div>
     </li>
     )
