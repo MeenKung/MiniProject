@@ -2,6 +2,8 @@ import React,{useState,useEffect} from 'react';
 import Post from './components/Post';
 import CreatePostForm from './components/CreatePostForm';
 import {firestore} from './index';
+import firebase from "firebase"
+import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import './App.css';
 
 function App() {
@@ -12,8 +14,25 @@ function App() {
   const [image,setImage] = useState('')
   const [stock,setStock] = useState(0)
 
+  const [isSignedIn,setIsSignedInState] = useState(false)
+
+  const uiConfig = {
+    signInFlow: "popup",
+    signInOptions: [
+      firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      firebase.auth.FacebookAuthProvider.PROVIDER_ID
+    ],
+    callbacks: {
+      signInSuccessWithAuthResult: () => false
+    }
+  }
+  
   useEffect(()=>{
     retriveData()
+    firebase.auth().onAuthStateChanged(user => {
+      setIsSignedInState(!!user)
+      console.log("user", user)
+    })
   },[])
 
   const retriveData = () => {
@@ -80,6 +99,22 @@ function App() {
       <div>{showCreateForm?<CreatePostForm createClick={createClickHandler} setHandler={setTitleImagePost}/>:null}</div>
       <ul style={{display:'flex',listStyle:'none'}}>{ renderPost()}</ul>
       <button onClick={buyClickHandler}>buy</button>
+      {isSignedIn ? (
+          <span>
+            <div>Signed In!</div>
+            <button onClick={() => firebase.auth().signOut()}>Sign out!</button>
+            <h1>Welcome {firebase.auth().currentUser.displayName}</h1>
+            <img
+              alt="profile"
+              src={firebase.auth().currentUser.photoURL}
+            />
+          </span>
+        ) : 
+            <StyledFirebaseAuth
+            uiConfig={uiConfig}
+            firebaseAuth={firebase.auth()}
+          />
+            }
     </div>
   );
 }
