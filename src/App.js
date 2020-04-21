@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import Post from './components/Post';
 import Form from './components/Form';
+import BuyForm from './components/BuyForm';
 import config from './config';
 import firebase from 'firebase/app';
 import TabHeader from './components/TabHeader';
 import LoginForm from './components/LoginForm';
 import 'firebase/auth';
 import 'firebase/firestore';
+import 'firebase/storage'
 import './App.css';
 
 if (firebase.apps.length === 0)
-  firebase.initializeApp(config)
+firebase.initializeApp(config)
 export const firestore = firebase.firestore()
+export const storage = firebase.storage()
 
 function App() {
   const uiConfig = {
@@ -25,15 +28,24 @@ function App() {
     }
   }
 
-  const [posts, setPosts] = useState([])
+
   const [showForm, setShowForm] = useState(false)
   const [showLoginForm, setShowLoginForm] = useState(false)
+  const [showBuyForm, setShowBuyForm] = useState(false)
 
+  const [posts, setPosts] = useState([])
   const [title, setTitle] = useState('')
   const [image, setImage] = useState('')
+  const [imageAsFile, setImageAsFile] = useState('')
   const [content, setContent] = useState('')
   const [price, setPrice] = useState(0)
   const [stock, setStock] = useState(0)
+
+  const [bills, setBills] = useState([])
+  const [buyInfo, setBuyInfo] = useState([])
+  const [buyer,setBuyer] = useState('')
+  const [address,setAddress] = useState('')
+  const [postNO,setPostNO] = useState(0)
 
   const [isSignedIn, setIsSignedInState] = useState(false)
 
@@ -52,6 +64,13 @@ function App() {
       })
       setPosts(myPost)
     })
+    firestore.collection("bills").onSnapshot((snapshot) => {
+      let myBill = snapshot.docs.map(d => {
+        const {id,buyInfo,buyer,address,postNO } = d.data()
+        return {id,buyInfo,buyer,address,postNO }
+      })
+      setBills(myBill)
+    })
   }
 
   const renderPost = () => {
@@ -63,7 +82,8 @@ function App() {
             deletePostHandler={deletePostHandler}
             showEditDeleteButton={showForm}
             plusCountHandler={plusCountHandler}
-            minusCountHandler={minusCountHandler} />
+            minusCountHandler={minusCountHandler} 
+            buyHandler={buyHandler}/>
         )
       })
     else
@@ -75,7 +95,7 @@ function App() {
       setTitle(event.target.value)
     }
     if (event.target.name === 'image') {
-      setImage(event.target.value)
+      setImageAsFile(event.target.files[0])
     }
     if (event.target.name === 'content') {
       setContent(event.target.value)
@@ -88,13 +108,30 @@ function App() {
     }
   }
 
+  const setBuyData = (event) => {
+    if (event.target.name === 'buyer') {
+      setBuyer(event.target.value)
+    }
+    if (event.target.name === 'address') {
+      setAddress(event.target.value)
+    }
+    if (event.target.name === 'postNO') {
+      setPostNO(event.target.value)
+    }
+  }
+
   const clearData = () => {
     setTitle('')
     setImage('')
     setContent('')
     setStock(0)
     setPrice(0)
+    setBuyInfo([])
+    setBuyer('')
+    setAddress('')
+    setPostNO(0)
   }
+
 
   const createPostHandler = () => {
     let id = (posts.length === 0) ? 1 : posts[posts.length - 1].id + 1
@@ -106,6 +143,7 @@ function App() {
   const cancelPostHandler = () => {
     clearData()
     setShowForm(false)
+    setShowBuyForm(false)
   }
 
 
@@ -135,6 +173,38 @@ function App() {
     }
   }
 
+  const buyHandler = (post) => {
+    const {title, count, price, seller } = post
+    if(count>0){
+      let buyinfo = {title,count,price,seller,cost:price*count}
+      setBuyInfo(buyinfo)
+      setShowBuyForm(true)
+      setShowForm(false)
+    }
+  }
+  const createBillHandler = () => {
+    let id = (bills.length === 0) ? 1 : bills[bills.length - 1].id + 1
+    firestore.collection("bills").doc(id + '').set({id,buyInfo,address,buyer,postNO})
+    clearData()
+    setShowBuyForm(false)
+  }
+
+  const handleFireBaseUpload = e => {
+    e.preventDefault()
+    const uploadTask = storage.ref(`/images/${imageAsFile.name}`).put(imageAsFile)
+    uploadTask.on('state_changed', 
+    (snapShot) => {
+      console.log(snapShot)
+    }, (err) => {
+      console.log(err)
+    }, () => {
+      storage.ref('images').child(imageAsFile.name).getDownloadURL()
+     .then(fireBaseUrl => {
+      setImage(fireBaseUrl)
+     })
+    })
+  }
+
   return (
     <div className="App">
       <TabHeader isSignedIn={isSignedIn}
@@ -144,19 +214,21 @@ function App() {
             setShowForm(false)
             setShowLoginForm(false)
         }}
-        customClick={() => setShowForm(true)}
-        signInClick={() => {
-          setShowLoginForm(true)
+        customClick={() => {setShowForm(true)
+          setShowBuyForm(false)
+        }}
+        signInClick={() => {setShowLoginForm(true)
+        setShowBuyForm(false)
         }}
         cancelClick={() => setShowLoginForm(false)}
         showCancelButton={showLoginForm}
         />
       <LoginForm isSignedIn={isSignedIn} showLoginForm={showLoginForm} uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>  
-      <div className="body">
-        <Form isSignedIn={isSignedIn} showLoginForm={showLoginForm} showForm={showForm} setHandler={setPostData} cancelPostHandler={cancelPostHandler} createPostHandler={createPostHandler}/>  
-        <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderPost()}</ul>
-
-      </div>
+      <Form isSignedIn={isSignedIn} showLoginForm={showLoginForm} showForm={showForm} 
+        handleFireBaseUpload={handleFireBaseUpload}
+        setHandler={setPostData} cancelPostHandler={cancelPostHandler} createPostHandler={createPostHandler}/>
+      <BuyForm showBuyForm={showBuyForm} buyInfo={buyInfo} setHandler={setBuyData} cancelHandler={cancelPostHandler} confirmHandler={createBillHandler}/>  
+      <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderPost()}</ul>
     </div>
   );
 }

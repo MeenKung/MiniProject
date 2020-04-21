@@ -1,7 +1,7 @@
 import React from 'react';
 import './Form.css';
 export default (props) => {
-    const {isSignedIn,showLoginForm,showForm,setHandler,createPostHandler,cancelPostHandler} = props
+    const {isSignedIn,showLoginForm,showForm,setHandler,handleFireBaseUpload,createPostHandler,cancelPostHandler} = props
     let style = null
     if(showLoginForm===false||isSignedIn===true)
     style = "formShowNoColor"
@@ -20,10 +20,11 @@ export default (props) => {
             </div>
             <div className="row">
                 <div className="col-25">
-                    image(url):
+                    image:
                 </div>
                 <div className="col-50">
-                    <input type='text' name='image' onChange={setHandler}/>
+                    <input type='file' name='image' onChange={setHandler}/>
+                    <button onClick={handleFireBaseUpload}>upload to firebase</button>
                 </div>
             </div>
             <div className="row">
