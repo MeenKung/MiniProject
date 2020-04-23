@@ -45,7 +45,7 @@ export default (props) => {
                     price : 
                 </div>
                 <div className="col-50">
-                    {price}
+                    {price} THB
                 </div>
             </div>
             <div className="row">
@@ -69,7 +69,7 @@ export default (props) => {
                 All cost :
             </div>
             <div className="col-50">
-                    {cost}
+                    {cost} THB
                 </div>
             </div>
             <center><br/>

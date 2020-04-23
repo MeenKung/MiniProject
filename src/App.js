@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Post from './components/Post';
 import Form from './components/Form';
 import BuyForm from './components/BuyForm';
+import Bill from './components/Bill';
 import config from './config';
 import firebase from 'firebase/app';
 import TabHeader from './components/TabHeader';
@@ -20,6 +21,7 @@ function App() {
   const uiConfig = {
     signInFlow: "popup",
     signInOptions: [
+      firebase.auth.EmailAuthProvider.PROVIDER_ID,
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
       firebase.auth.FacebookAuthProvider.PROVIDER_ID
     ],
@@ -32,6 +34,10 @@ function App() {
   const [showForm, setShowForm] = useState(false)
   const [showLoginForm, setShowLoginForm] = useState(false)
   const [showBuyForm, setShowBuyForm] = useState(false)
+  const [showBills, setShowBills] = useState(false)
+
+  const [searchPost, setSearchPost] = useState('')
+
 
   const [posts, setPosts] = useState([])
   const [title, setTitle] = useState('')
@@ -41,6 +47,7 @@ function App() {
   const [price, setPrice] = useState(0)
   const [stock, setStock] = useState(0)
 
+  const [post, setPost] = useState([])
   const [bills, setBills] = useState([])
   const [buyInfo, setBuyInfo] = useState([])
   const [buyer,setBuyer] = useState('')
@@ -51,11 +58,14 @@ function App() {
 
   useEffect(() => {
     retriveData()
+    loginStatus()
+  }, [])
+
+  const loginStatus = () => {
     firebase.auth().onAuthStateChanged(user => {
       setIsSignedInState(!!user)
     })
-  }, [])
-
+  }
   const retriveData = () => {
     firestore.collection("posts").onSnapshot((snapshot) => {
       let myPost = snapshot.docs.map(d => {
@@ -76,6 +86,7 @@ function App() {
   const renderPost = () => {
     if (posts && posts.length)
       return posts.map((post) => {
+        if(searchPost===post.title.slice(0,searchPost.length))
         return (
           <Post key={post.id} post={post}
             editPostHandler={editPostHandler}
@@ -85,6 +96,22 @@ function App() {
             minusCountHandler={minusCountHandler} 
             buyHandler={buyHandler}/>
         )
+        else
+        return null
+      })
+    else
+      return (<li>No Post</li>)
+  }
+
+  const renderBill = () => {
+    if (bills && bills.length)
+      return bills.map((bill) => {
+        if(showBills)
+        return (
+          <Bill key={bill.id} bill={bill}/>
+        )
+        else
+        return null
       })
     else
       return (<li>No Post</li>)
@@ -127,9 +154,11 @@ function App() {
     setStock(0)
     setPrice(0)
     setBuyInfo([])
+    setPost([])
     setBuyer('')
     setAddress('')
     setPostNO(0)
+    setSearchPost('')
   }
 
 
@@ -174,6 +203,7 @@ function App() {
   }
 
   const buyHandler = (post) => {
+    setPost(post)
     const {title, count, price, seller } = post
     if(count>0){
       let buyinfo = {title,count,price,seller,cost:price*count}
@@ -185,6 +215,8 @@ function App() {
   const createBillHandler = () => {
     let id = (bills.length === 0) ? 1 : bills[bills.length - 1].id + 1
     firestore.collection("bills").doc(id + '').set({id,buyInfo,address,buyer,postNO})
+    const {title, image, content, stock, count, price, seller } = post
+    firestore.collection("posts").doc(post.id + '').set({ id:post.id, title, image, content, count:0, stock:stock-count, price, seller })
     clearData()
     setShowBuyForm(false)
   }
@@ -209,16 +241,24 @@ function App() {
     <div className="App">
       <TabHeader isSignedIn={isSignedIn}
         firebaseAuth={firebase.auth()} 
-        signOutClick={() => {firebase.auth().signOut()
-            clearData()
-            setShowForm(false)
-            setShowLoginForm(false)
+        search={(e)=>{setSearchPost(e.target.value)}}
+        signOutClick={() => {
+          firebase.auth().signOut()
+          clearData()
+          setShowForm(false)
+          setShowLoginForm(false)
+          setShowBills(false)
         }}
-        customClick={() => {setShowForm(true)
+        customClick={() => {
+          setShowForm(true)
           setShowBuyForm(false)
         }}
-        signInClick={() => {setShowLoginForm(true)
-        setShowBuyForm(false)
+        showBillsClick={() => {
+          setShowBills(!showBills)
+        }}
+        signInClick={() => {
+          setShowLoginForm(true)
+          setShowBuyForm(false)
         }}
         cancelClick={() => setShowLoginForm(false)}
         showCancelButton={showLoginForm}
@@ -229,6 +269,7 @@ function App() {
         setHandler={setPostData} cancelPostHandler={cancelPostHandler} createPostHandler={createPostHandler}/>
       <BuyForm showBuyForm={showBuyForm} buyInfo={buyInfo} setHandler={setBuyData} cancelHandler={cancelPostHandler} confirmHandler={createBillHandler}/>  
       <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderPost()}</ul>
+      <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderBill()}</ul>
     </div>
   );
 }
