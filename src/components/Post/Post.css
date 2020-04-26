@@ -6,11 +6,11 @@
     box-shadow: 0 0 6px 0 rgba(0,0,0,0.15);
     margin: 0 16px 16px 0;
     border-radius: 4px;
-    padding-left: 10px;
-    padding-right:20px;
+    padding-left: 20px;
+    padding-right:10px;
     padding-top: 10px;
 }
-.container{
+.postContainer{
     display: flex;
     flex-direction: row;
 }
@@ -24,17 +24,16 @@
     display: inline-block;
     font-size: 16px;
     cursor: pointer;
-  }
+    margin-bottom: 0px;
+  } 
+.btn-group .button:not(:last-child) {
+    border-right: none; 
+}
   
-  .btn-group .button:not(:last-child) {
-    border-right: none; /* Prevent double borders */
-  }
-  
-  .btn-group .button:hover {
+.btn-group .button:hover {
     background-color: #3e8e41;
-  }
-  
-  .img{
+}
+.imgPost{
     margin-left: 10px;
     margin-right: 10px;
-  }
+}

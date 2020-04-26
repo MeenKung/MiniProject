@@ -1,0 +1,16 @@
+.bill{ position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    height: 320px;
+    box-shadow: 0 0 6px 0 rgba(0,0,0,0.15);
+    margin: 0 16px 16px 0;
+    border-radius: 4px;
+    padding-left: 20px;
+    padding-right:10px;
+    padding-top: 10px;
+}
+.billContainer{
+    display: flex;
+    flex-direction: row;
+}

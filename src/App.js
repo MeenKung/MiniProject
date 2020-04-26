@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import Post from './components/Post';
-import Form from './components/Form';
-import BuyForm from './components/BuyForm';
-import Bill from './components/Bill';
+import Post from './components/Post/Post';
+import Form from './components/Form/Form';
+import BuyForm from './components/Form/BuyForm';
+import LoginForm from './components/Form/LoginForm';
+import Bill from './components/Bill/Bill';
+import TabHeader from './components/TabHeader';
 import config from './config';
 import firebase from 'firebase/app';
-import TabHeader from './components/TabHeader';
-import LoginForm from './components/LoginForm';
 import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/storage'
@@ -16,6 +16,7 @@ if (firebase.apps.length === 0)
 firebase.initializeApp(config)
 export const firestore = firebase.firestore()
 export const storage = firebase.storage()
+export const firebaseAuth = firebase.auth()
 
 function App() {
   const uiConfig = {
@@ -62,7 +63,7 @@ function App() {
   }, [])
 
   const loginStatus = () => {
-    firebase.auth().onAuthStateChanged(user => {
+    firebaseAuth.onAuthStateChanged(user => {
       setIsSignedInState(!!user)
     })
   }
@@ -106,15 +107,12 @@ function App() {
   const renderBill = () => {
     if (bills && bills.length)
       return bills.map((bill) => {
-        if(showBills)
         return (
-          <Bill key={bill.id} bill={bill}/>
+          <Bill key={bill.id} bill={bill} deleteBillHandler={deleteBillHandler}/>
         )
-        else
-        return null
       })
     else
-      return (<li>No Post</li>)
+      return (<li>No bill</li>)
   }
 
   const setPostData = (event) => {
@@ -163,10 +161,11 @@ function App() {
 
 
   const createPostHandler = () => {
+    if(title!=''&&image!=''&&content!=''&&price!=0&&stock!=0){
     let id = (posts.length === 0) ? 1 : posts[posts.length - 1].id + 1
-    firestore.collection("posts").doc(id + '').set({ id, title, image, content, count: 0, stock, price, seller: firebase.auth().currentUser.displayName })
+    firestore.collection("posts").doc(id + '').set({ id, title, image, content, count: 0, stock, price, seller: firebaseAuth.currentUser.displayName })
     clearData()
-    setShowForm(false)
+    setShowForm(false)}
   }
 
   const cancelPostHandler = () => {
@@ -177,9 +176,11 @@ function App() {
 
 
   const editPostHandler = (id) => {
-    firestore.collection("posts").doc(id + '').set({ id, title, image, content, count: 0, stock, price, seller: firebase.auth().currentUser.displayName })
+    if(title!=''&&image!=''&&content!=''&&price!=0&&stock!=0){
+    firestore.collection("posts").doc(id + '').set({ id, title, image, content, count: 0, stock, price, seller: firebaseAuth.currentUser.displayName })
     clearData()
     setShowForm(false)
+    }
   }
 
   const deletePostHandler = (id) => {
@@ -213,14 +214,18 @@ function App() {
     }
   }
   const createBillHandler = () => {
+    if(buyer!=''&& address!=''&& postNO!=0){
     let id = (bills.length === 0) ? 1 : bills[bills.length - 1].id + 1
     firestore.collection("bills").doc(id + '').set({id,buyInfo,address,buyer,postNO})
     const {title, image, content, stock, count, price, seller } = post
     firestore.collection("posts").doc(post.id + '').set({ id:post.id, title, image, content, count:0, stock:stock-count, price, seller })
     clearData()
     setShowBuyForm(false)
+    }
   }
-
+  const deleteBillHandler = (id) => {
+    firestore.collection("bills").doc(id + '').delete()
+  }
   const handleFireBaseUpload = e => {
     e.preventDefault()
     const uploadTask = storage.ref(`/images/${imageAsFile.name}`).put(imageAsFile)
@@ -239,11 +244,10 @@ function App() {
 
   return (
     <div className="App">
-      <TabHeader isSignedIn={isSignedIn}
-        firebaseAuth={firebase.auth()} 
+      <TabHeader isSignedIn={isSignedIn} 
         search={(e)=>{setSearchPost(e.target.value)}}
         signOutClick={() => {
-          firebase.auth().signOut()
+          firebaseAuth.signOut()
           clearData()
           setShowForm(false)
           setShowLoginForm(false)
@@ -263,13 +267,25 @@ function App() {
         cancelClick={() => setShowLoginForm(false)}
         showCancelButton={showLoginForm}
         />
-      <LoginForm isSignedIn={isSignedIn} showLoginForm={showLoginForm} uiConfig={uiConfig} firebaseAuth={firebase.auth()}/>  
+      <LoginForm isSignedIn={isSignedIn} showLoginForm={showLoginForm} uiConfig={uiConfig}/>  
       <Form isSignedIn={isSignedIn} showLoginForm={showLoginForm} showForm={showForm} 
         handleFireBaseUpload={handleFireBaseUpload}
         setHandler={setPostData} cancelPostHandler={cancelPostHandler} createPostHandler={createPostHandler}/>
-      <BuyForm showBuyForm={showBuyForm} buyInfo={buyInfo} setHandler={setBuyData} cancelHandler={cancelPostHandler} confirmHandler={createBillHandler}/>  
-      <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderPost()}</ul>
-      <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderBill()}</ul>
+      <BuyForm showBuyForm={showBuyForm} buyInfo={buyInfo} setHandler={setBuyData} cancelHandler={cancelPostHandler} confirmHandler={createBillHandler}/>    
+      <ul style={{ display: 'flex', flexWrap: 'wrap'}}>{renderPost()}</ul>
+      {showBills?<div><center>
+        <div className="billTab">
+        <div className="content">
+          Your bill
+        </div>
+      </div>
+      </center>
+      <ul style={{ display: 'flex', flexWrap: 'wrap' }}>{renderBill()}</ul></div>:null}
+      <div className="foot">
+        <div className="content">
+          Alameen Da-oh 6035512018
+          </div>
+      </div>
     </div>
   );
 }

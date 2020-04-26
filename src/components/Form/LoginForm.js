@@ -1,8 +1,9 @@
 import React from 'react'
 import './Form.css';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
+import {firebaseAuth} from '../../App'
 export default (props) => {
-    const {isSignedIn,showLoginForm,firebaseAuth,uiConfig} = props
+    const {isSignedIn,showLoginForm,uiConfig} = props
     return(
        <div>
            {
@@ -12,9 +13,7 @@ export default (props) => {
                    <StyledFirebaseAuth
                uiConfig={uiConfig}
                firebaseAuth={firebaseAuth}/>
-                   
                </div>
-
                </center>
                :null
            }

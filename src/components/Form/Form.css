@@ -1,36 +1,34 @@
-.col-25 {
+.col25 {
     float: left;
     width: 25%;
     margin-top: 6px;
     margin-left: 50px;
   }
-  
-  .col-50 {
+.col50 {
     float: left;
     width: 50%;
     margin-top: 6px;
-  }
-  .row:after {
+}
+.row:after {
     content: "";
     display: table;
     clear: both;
-  }
-  input[type=text], select, textarea {
+}
+input[type=text], select, textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
     resize: vertical;
-  }
-  input[type=number], select, textarea {
+}
+input[type=number], select, textarea {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
     resize: vertical;
-  }
-
-  .myButton {
+}
+.cButton {
 	box-shadow: 3px 4px 0px 0px #8a2a21;
 	background:linear-gradient(to bottom, #c62d1f 5%, #f24437 100%);
 	background-color:#c62d1f;
@@ -45,16 +43,15 @@
 	text-decoration:none;
 	text-shadow:0px 1px 0px #810e05;
 }
-.myButton:hover {
+.cButton:hover {
 	background:linear-gradient(to bottom, #f24437 5%, #c62d1f 100%);
 	background-color:#f24437;
 }
-.myButton:active {
+.cButton:active {
 	position:relative;
 	top:1px;
 }
-
-.bttn {
+.cancelButton {
 	box-shadow: 3px 4px 0px 0px #3e7327;
 	background:linear-gradient(to bottom, #77b55a 5%, #72b352 100%);
 	background-color:#77b55a;
@@ -69,17 +66,13 @@
 	text-decoration:none;
 	text-shadow:0px 1px 0px #5b8a3c;
 }
-.bttn:hover {
+.cancelButton:hover {
 	background:linear-gradient(to bottom, #72b352 5%, #77b55a 100%);
 	background-color:#72b352;
 }
-.bttn:active {
+.cancelButton:active {
 	position:relative;
 	top:1px;
-}
-.App{
-     align-items: center;
-      
 }
 .formShow{
 	margin-top: 8%;

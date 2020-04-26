@@ -9,72 +9,72 @@ export default (props) => {
             <center>
                 <div className="buyForm">
                 <div className="row">
-                <div className="col-25">
+                <div className="col25">
                     Buyer Name :
                 </div>
-                <div className="col-50">
+                <div className="col50">
                 <input type='text' name='buyer' onChange={setHandler}/>
                 </div>
             </div>
             <div className="row">
-                <div className="col-25">
+                <div className="col25">
                     Address :
                 </div>
-                <div className="col-50">
+                <div className="col50">
                 <input type='text' name='address' onChange={setHandler}/>
                 </div>
             </div>
             <div className="row">
-                <div className="col-25">
+                <div className="col25">
                     PostNo. :
                 </div>
-                <div className="col-50">
+                <div className="col50">
                     <input type='number' name='postNO' onChange={setHandler}/>
                 </div>
             </div>
             <div className="row">
-                <div className="col-25">
+                <div className="col25">
                     title : 
                 </div>
-                <div className="col-50">
+                <div className="col50">
                     {title}
                 </div>
             </div>
             <div className="row">
-                <div className="col-25">
+                <div className="col25">
                     price : 
                 </div>
-                <div className="col-50">
+                <div className="col50">
                     {price} THB
                 </div>
             </div>
             <div className="row">
-            <div className="col-25">
+            <div className="col25">
                 seller :
             </div>
-            <div className="col-50">
+            <div className="col50">
                     {seller}
                 </div>
             </div>
             <div className="row">
-            <div className="col-25">
+            <div className="col25">
                 count :
             </div>
-            <div className="col-50">
+            <div className="col50">
                     {count}
                 </div>
             </div>
             <div className="row">
-            <div className="col-25">
+            <div className="col25">
                 All cost :
             </div>
-            <div className="col-50">
+            <div className="col50">
                     {cost} THB
                 </div>
             </div>
             <center><br/>
-            <button className="bttn" onClick={confirmHandler} >Confirm</button> &nbsp;
-            <button  className="myButton"  onClick={cancelHandler}>Cancel</button>
+            <button className="cButton" onClick={confirmHandler} >Confirm</button> &nbsp;
+            <button  className="cancelButton"  onClick={cancelHandler}>Cancel</button>
             </center>
             </div>
         </center>: null
