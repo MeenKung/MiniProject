@@ -1,10 +1,15 @@
 import React from 'react';
 import deleteIcon from '../images/delete.png';
-import './Bill.css'
+import './Bill.css';
+import {firestore} from '../../App'
+
 export default (props) => {
-    const {bill,deleteBillHandler} = props
+    const {bill} = props
     const {id,buyInfo,buyer,address,postNO} = bill
 
+    const deleteBillHandler = (id) => {
+        firestore.collection("bills").doc(id + '').delete()
+    }
     return(  
     <li className='bill'>
         <div className="billContainer">

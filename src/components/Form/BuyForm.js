@@ -1,7 +1,11 @@
 import React from 'react';
 import './Form.css';
+import { useSelector, useDispatch } from 'react-redux';
 export default (props) => {
-    const {showBuyForm,setHandler,buyInfo,cancelHandler,confirmHandler} = props
+    const dispatch = useDispatch();
+    const showBuyForm = useSelector(state => state.showStatus.showBuyForm)
+    const buyInfo = useSelector(state => state.buyInfo)
+    const {cancelHandler,confirmHandler} = props
     const {title,price,seller,count,cost} = buyInfo
     return(
         <div>
@@ -13,7 +17,7 @@ export default (props) => {
                     Buyer Name :
                 </div>
                 <div className="col50">
-                <input type='text' name='buyer' onChange={setHandler}/>
+                <input type='text' name='buyer' onChange={(e)=>{dispatch({type:'BUYER_CHANGE',buyer:e.target.value})}}/>
                 </div>
             </div>
             <div className="row">
@@ -21,7 +25,7 @@ export default (props) => {
                     Address :
                 </div>
                 <div className="col50">
-                <input type='text' name='address' onChange={setHandler}/>
+                <input type='text' name='address' onChange={(e)=>{dispatch({type:'ADDRESS_CHANGE',address:e.target.value})}}/>
                 </div>
             </div>
             <div className="row">
@@ -29,7 +33,7 @@ export default (props) => {
                     PostNo. :
                 </div>
                 <div className="col50">
-                    <input type='number' name='postNO' onChange={setHandler}/>
+                    <input type='number' name='postNO' onChange={(e)=>{dispatch({type:'POSTNO_CHANGE',postNO:e.target.value})}}/>
                 </div>
             </div>
             <div className="row">
